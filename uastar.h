@@ -32,15 +32,15 @@ struct path_finder {
 	int32_t rows;
 	int32_t start;
 	int32_t end;
-	uint8_t has_path;
-	uint8_t open_set[PATH_FINDER_MAX_CELLS];
-	uint8_t closed_set[PATH_FINDER_MAX_CELLS];
-	int32_t parents[PATH_FINDER_MAX_CELLS];
-	uint8_t g_score[PATH_FINDER_MAX_CELLS];
-	uint8_t f_score[PATH_FINDER_MAX_CELLS];
-	uint8_t path[PATH_FINDER_MAX_CELLS];
-	uint8_t passables[PATH_FINDER_MAX_CELLS];
-	uint8_t (*fill_func)(struct path_finder *path_finder, int32_t col, int32_t row);
+	uint8_t has_path;/* This seems to be a bool */
+	uint8_t open_set[PATH_FINDER_MAX_CELLS];/* This seems to be a bool. Could be a bit flag. */
+	uint8_t closed_set[PATH_FINDER_MAX_CELLS];/* This seems to be a bool. Could be a bit flag. */
+	int16_t parents[PATH_FINDER_MAX_CELLS];/* This needs to hold up to PATH_FINDER_MAX_CELLS, so if bigger than 256x256 should be 32 bit */
+	uint8_t g_score[PATH_FINDER_MAX_CELLS];/* This seems to not go above ~140 so int8 is probably enough, but for bigger than 64x64 should be 16 bit */
+	uint8_t f_score[PATH_FINDER_MAX_CELLS];/* This seems to not go above ~170 so int8 is probably enough, but for bigger than 64x64 should be 16 bit */
+	uint8_t path[PATH_FINDER_MAX_CELLS];   /* This seems to be a bool. Could be a bit flag. */
+	uint8_t passables[PATH_FINDER_MAX_CELLS];/* This seems to be a bool. Could be a bit flag. */
+	uint8_t (*fill_func)(struct path_finder *path_finder, int32_t col, int32_t row);/* This seems to be a bool */
 	int32_t (*score_func)(struct path_finder *path_finder, int32_t col, int32_t row, void *data);
 	void *data;
 };

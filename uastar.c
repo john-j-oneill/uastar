@@ -172,9 +172,9 @@ printf("g_score=%d\n",tmp_g_score);
 							path_finder->f_score[n] = path_finder->g_score[n] + path_finder_heuristic(path_finder, n);
 							if (path_finder->score_func != NULL) {
 								path_finder->f_score[n] = path_finder->f_score[n] + path_finder->score_func(path_finder, n / path_finder->cols, n % path_finder->cols, data);
+							}
 if(path_finder->f_score[n]>128)
 printf("f_score=%d\n",path_finder->f_score[n]);
-							}
 							path_finder->open_set[n] = 1;
 						}
 					}
