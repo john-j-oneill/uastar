@@ -104,7 +104,7 @@ int main(int argc, char **args)
 	int32_t e_row;
 	struct path_finder path_finder;
 	if (argc != 9) {
-		puts("Usage: test [passable chance 0-100] [random seed integer] [start column] [start row] [end column] [end row] [width <= 32] [height <= 32]");
+		puts("Usage: test [passable chance 0-100] [random seed integer] [start column] [start row] [end column] [end row] [width <= 64] [height <= 64]");
 		goto done;
 	}
 	passable_chance = (double)atoi(args[1]) / 100.0;
@@ -115,7 +115,7 @@ int main(int argc, char **args)
 	e_row = atoi(args[6]);
 	width = atoi(args[7]);
 	height = atoi(args[8]);
-	if (width < 1 || width > 32 || height < 1 || height > 32) {
+	if (width < 1 || width > 64 || height < 1 || height > 64) {
 		puts("Invalid width or height.");
 		goto done;
 	}

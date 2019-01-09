@@ -19,6 +19,7 @@ the following restrictions:
 */
 
 #include <stddef.h>
+#include <stdio.h>
 #include "uastar.h"
 
 static int32_t path_finder_heuristic(struct path_finder *path_finder, int32_t tile)
@@ -104,7 +105,6 @@ void path_finder_fill(struct path_finder *path_finder)
 		col = 0;
 		while (col < path_finder->cols) {
 			path_finder->passables[row * path_finder->cols + col] = path_finder->fill_func(path_finder, col, row);
-			path_finder->o_score[row * path_finder->cols + col] = 0;
 			col = col + 1;
 		}
 		row = row + 1;
@@ -167,9 +167,13 @@ void path_finder_find(struct path_finder *path_finder, void *data)
 						if (path_finder->open_set[n] == 0 || tmp_g_score < path_finder->g_score[n]) {
 							path_finder->parents[n] = current;
 							path_finder->g_score[n] = tmp_g_score;
+if(tmp_g_score>128)
+printf("g_score=%d\n",tmp_g_score);
 							path_finder->f_score[n] = path_finder->g_score[n] + path_finder_heuristic(path_finder, n);
 							if (path_finder->score_func != NULL) {
 								path_finder->f_score[n] = path_finder->f_score[n] + path_finder->score_func(path_finder, n / path_finder->cols, n % path_finder->cols, data);
+if(path_finder->f_score[n]>128)
+printf("f_score=%d\n",path_finder->f_score[n]);
 							}
 							path_finder->open_set[n] = 1;
 						}
@@ -179,11 +183,6 @@ void path_finder_find(struct path_finder *path_finder, void *data)
 			}
 		}
 	}
-}
-
-int32_t path_finder_get_score(struct path_finder *path_finder, int32_t col, int32_t row)
-{
-	return path_finder->o_score[row * path_finder->cols + col];
 }
 
 int32_t path_finder_get_heuristic_score(struct path_finder *path_finder, int32_t col, int32_t row)
@@ -251,16 +250,6 @@ void path_finder_set_end(struct path_finder *path_finder, int32_t col, int32_t r
 	}
 }
 
-void path_finder_clear_score(struct path_finder *path_finder)
-{
-	int32_t i;
-	i = 0;
-	while (i < PATH_FINDER_MAX_CELLS) {
-		path_finder->o_score[i] = 0;
-		i = i + 1;
-	}
-}
-
 void path_finder_clear_path(struct path_finder *path_finder)
 {
 	int32_t i;
@@ -287,7 +276,6 @@ void init_path_finder(struct path_finder *path_finder)
 		path_finder->parents[i] = 0;
 		path_finder->g_score[i] = 0;
 		path_finder->f_score[i] = 0;
-		path_finder->o_score[i] = 0;
 		path_finder->path[i] = 0;
 		path_finder->passables[i] = 0;
 		i = i + 1;
