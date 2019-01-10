@@ -29,13 +29,13 @@ Compiling with GCC:
 
 double passable_chance;
 
-static uint8_t fill_cb(struct path_finder *path_finder, int32_t col, int32_t row)
+static BOOLEAN fill_cb(struct path_finder *path_finder, INDEX_TYPE col, INDEX_TYPE row)
 {
-	uint8_t is_passable;
-	is_passable = 0;
+	BOOLEAN is_passable;
+	is_passable = FALSE;
 	/* Fill the map randomly with passable cells */
 	if ((double)rand() / (double)RAND_MAX <= passable_chance) {
-		is_passable = 1;
+		is_passable = TRUE;
 	}
 	return is_passable;
 }
@@ -46,47 +46,47 @@ void print_map(struct path_finder *path_finder)
 	int32_t col = 0;
 	printf("Map:\n");
 	col = 0;
-	printf(" =");
+	printf("=");
 	while (col < path_finder->cols - 1) {
-		printf("==");
+		printf("=");
 		col++;
 	}
-	printf("== \n");
+	printf("= \n");
 	while (row < path_finder->rows) {
 		col = 0;
 		printf("|");
 		while (col < path_finder->cols) {
 			if (path_finder_is_start(path_finder, col, row) == 1) {
 				if (path_finder_is_passable(path_finder, col, row) == 1) {
-					printf(" S");
+					printf("S");
 				} else {
-					printf(" s");
+					printf("s");
 				}
 			} else if (path_finder_is_end(path_finder, col, row) == 1) {
 				if (path_finder_is_passable(path_finder, col, row) == 1) {
-					printf(" E");
+					printf("E");
 				} else {
-					printf(" e");
+					printf("e");
 				}
 			} else if (path_finder_is_path(path_finder, col, row) == 1) {
-				printf(" *");
+				printf("*");
 			} else if (!path_finder_is_passable(path_finder, col, row) == 1) {
-				printf(" O");
+				printf("O");
 			} else {
-				printf("  ");
+				printf(" ");
 			}
 			col++;
 		}
-		printf(" |\n");
+		printf("|\n");
 		row++;
 	}
 	col = 0;
-	printf(" =");
+	printf("=");
 	while (col < path_finder->cols - 1) {
-		printf("==");
+		printf("=");
 		col++;
 	}
-	printf("== \n");
+	printf("= \n");
 	if (path_finder->has_path) {
 		printf("A path was found!\n\n");
 	} else {
@@ -104,7 +104,7 @@ int main(int argc, char **args)
 	int32_t e_row;
 	struct path_finder path_finder;
 	if (argc != 9) {
-		puts("Usage: test [passable chance 0-100] [random seed integer] [start column] [start row] [end column] [end row] [width <= 64] [height <= 64]");
+		puts("Usage: test [passable chance 0-100] [random seed integer] [start column] [start row] [end column] [end row] [width <= 128] [height <= 128]");
 		goto done;
 	}
 	passable_chance = (double)atoi(args[1]) / 100.0;
@@ -115,7 +115,7 @@ int main(int argc, char **args)
 	e_row = atoi(args[6]);
 	width = atoi(args[7]);
 	height = atoi(args[8]);
-	if (width < 1 || width > 64 || height < 1 || height > 64) {
+	if (width < 1 || width > 128 || height < 1 || height > 128) {
 		puts("Invalid width or height.");
 		goto done;
 	}

@@ -24,37 +24,61 @@ the following restrictions:
 #include <stdint.h>
 
 #ifndef PATH_FINDER_MAX_CELLS
-#define PATH_FINDER_MAX_CELLS 4096
+#define PATH_FINDER_MAX_CELLS 16384
 #endif
 
-struct path_finder {
-	int32_t cols;
-	int32_t rows;
-	int32_t start;
-	int32_t end;
-	uint8_t has_path;/* This seems to be a bool */
-	uint8_t open_set[PATH_FINDER_MAX_CELLS];/* This seems to be a bool. Could be a bit flag. */
-	uint8_t closed_set[PATH_FINDER_MAX_CELLS];/* This seems to be a bool. Could be a bit flag. */
-	int16_t parents[PATH_FINDER_MAX_CELLS];/* This needs to hold up to PATH_FINDER_MAX_CELLS, so if bigger than 256x256 should be 32 bit */
-	uint8_t g_score[PATH_FINDER_MAX_CELLS];/* This seems to not go above ~140 so int8 is probably enough, but for bigger than 64x64 should be 16 bit */
-	uint8_t f_score[PATH_FINDER_MAX_CELLS];/* This seems to not go above ~170 so int8 is probably enough, but for bigger than 64x64 should be 16 bit */
-	uint8_t path[PATH_FINDER_MAX_CELLS];   /* This seems to be a bool. Could be a bit flag. */
-	uint8_t passables[PATH_FINDER_MAX_CELLS];/* This seems to be a bool. Could be a bit flag. */
-	uint8_t (*fill_func)(struct path_finder *path_finder, int32_t col, int32_t row);/* This seems to be a bool */
-	int32_t (*score_func)(struct path_finder *path_finder, int32_t col, int32_t row, void *data);
+
+typedef int8_t    S8;
+typedef int16_t   S16;
+typedef int32_t   S32;
+typedef int64_t   S64;
+typedef uint8_t   U8;
+typedef uint16_t  U16;
+typedef uint32_t  U32;
+typedef uint64_t  U64;
+typedef float     F32;
+typedef double    F64;
+typedef uint8_t   BOOLEAN;
+typedef uint16_t   SCORE_TYPE;/* This seems to not go above ~170 so int8 is probably enough, but for bigger than 64x64 should be 16 bit */
+typedef uint16_t  INDEX_TYPE;/* This needs to hold up to PATH_FINDER_MAX_CELLS, so if bigger than 256x256 should be 32 bit */
+
+#define SCORE_MAX 65535
+#define FALSE 0U
+#define TRUE (!FALSE)
+
+/* To save RAM, the four booleans could be stored in one uint8_t as bit flags. However, this would add some time to evaluating them, so it's probably not worth it. */
+typedef struct{
+	BOOLEAN open_set;/* This seems to be a bool. Could be a bit flag. */
+	BOOLEAN closed_set;/* This seems to be a bool. Could be a bit flag. */
+	BOOLEAN path;   /* This seems to be a bool. Could be a bit flag. */
+	BOOLEAN passables;/* This seems to be a bool. Could be a bit flag. */
+	INDEX_TYPE parents;/* This needs to hold up to PATH_FINDER_MAX_CELLS, so if bigger than 256x256 should be 32 bit */
+	SCORE_TYPE g_score;/* This seems to not go above ~140 so int8 is probably enough, but for bigger than 64x64 should be 16 bit */
+	SCORE_TYPE f_score;/* This seems to not go above ~170 so int8 is probably enough, but for bigger than 64x64 should be 16 bit */
+} node_type;
+
+struct path_finder{
+	INDEX_TYPE cols;
+	INDEX_TYPE rows;
+	INDEX_TYPE start;
+	INDEX_TYPE end;
+	BOOLEAN has_path;/* This seems to be a bool */
+	node_type nodes[PATH_FINDER_MAX_CELLS];
+	BOOLEAN (*fill_func)(struct path_finder *path_finder, INDEX_TYPE col, INDEX_TYPE row);/* This seems to be a bool */
+	SCORE_TYPE (*score_func)(struct path_finder *path_finder, INDEX_TYPE col, INDEX_TYPE row, void *data);
 	void *data;
 };
 
-int32_t path_finder_get_heuristic_score(struct path_finder *path_finder, int32_t col, int32_t row);
-uint8_t path_finder_is_possible_target(struct path_finder *path_finder, int32_t col, int32_t row);
-uint8_t path_finder_is_passable(struct path_finder *path_finder, int32_t col, int32_t row);
-uint8_t path_finder_is_path(struct path_finder *path_finder, int32_t col, int32_t row);
-uint8_t path_finder_is_start(struct path_finder *path_finder, int32_t col, int32_t row);
-uint8_t path_finder_is_end(struct path_finder *path_finder, int32_t col, int32_t row);
+SCORE_TYPE path_finder_get_heuristic_score(struct path_finder *path_finder, INDEX_TYPE col, INDEX_TYPE row);
+BOOLEAN path_finder_is_possible_target(struct path_finder *path_finder, INDEX_TYPE col, INDEX_TYPE row);
+BOOLEAN path_finder_is_passable(struct path_finder *path_finder, INDEX_TYPE col, INDEX_TYPE row);
+BOOLEAN path_finder_is_path(struct path_finder *path_finder, INDEX_TYPE col, INDEX_TYPE row);
+BOOLEAN path_finder_is_start(struct path_finder *path_finder, INDEX_TYPE col, INDEX_TYPE row);
+BOOLEAN path_finder_is_end(struct path_finder *path_finder, INDEX_TYPE col, INDEX_TYPE row);
 void path_finder_find(struct path_finder *path_finder, void *data);
-void path_finder_set_path(struct path_finder *path_finder, int32_t col, int32_t row, uint8_t path);
-void path_finder_set_start(struct path_finder *path_finder, int32_t col, int32_t row);
-void path_finder_set_end(struct path_finder *path_finder, int32_t col, int32_t row);
+void path_finder_set_path(struct path_finder *path_finder, INDEX_TYPE col, INDEX_TYPE row, uint8_t path);
+void path_finder_set_start(struct path_finder *path_finder, INDEX_TYPE col, INDEX_TYPE row);
+void path_finder_set_end(struct path_finder *path_finder, INDEX_TYPE col, INDEX_TYPE row);
 void path_finder_clear_path(struct path_finder *path_finder);
 void path_finder_fill(struct path_finder *path_finder);
 void init_path_finder(struct path_finder *path_finder);
